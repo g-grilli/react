@@ -1,0 +1,26 @@
+{
+  "name": "react",
+  "version": "1.0.0",
+  "description": "lesson exercises for react",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/g-grilli/react.git"
+  },
+  "keywords": [
+    "react",
+    "react.js"
+  ],
+  "author": "Gene Grilli",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/g-grilli/react/issues"
+  },
+  "homepage": "https://github.com/g-grilli/react#readme",
+  "dependencies": {
+    "react-tap-event-plugin": "^2.0.1"
+  }
+}
