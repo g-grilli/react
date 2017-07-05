@@ -6,6 +6,8 @@ import TextField from 'material-ui/TextField';
 import Dialog from 'material-ui/Dialog';
 import './contacts.css';
 
+import database, {User} from './fsociety';
+
 function compare(a,b) {
       if (a.name < b.name) {
         return -1;
@@ -35,8 +37,8 @@ class Add extends Component {
   constructor(props) {
     super(props);
     
-    var contacts = localStorage.contacts || '[]';
-    contacts = JSON.parse(contacts);
+//    var contacts = localStorage.contacts || '[]';
+//    contacts = JSON.parse(contacts);
     
     this.state = {
       name: ' ',
@@ -47,10 +49,32 @@ class Add extends Component {
       state: ' ',
       zipCode: ' ',
       isOpened: ' ',
-      contacts: contacts
+      contacts: []
     };
     
-    this.state.contacts.sort(compare);
+    this.state.display_contacts = this.state.contacts;
+    
+    this.read_data();
+  }
+  
+  read_data () {
+    if (User.user) {
+      database.ref('contacts/' + User.user.uid)
+        .once('value').then(function(contacts) {
+          var contacts = contacts.val();
+          console.log(contacts);
+          if (contacts) {
+            this.state.contacts = contacts;
+            this.setState({contacts: this.state.contacts});
+            this.state.contacts.sort(compare);
+            this.state.display_contacts = this.state.contacts;
+          }
+        });
+    } else {
+      setTimeout(() => {
+        this.read_data();
+      }, 300);
+    }
   }
   
 update_state (event, key) {
@@ -60,8 +84,6 @@ this.setState({[key]: event.target.value});
 var new_state = {};
 new_state[key] = event.target.value;
 this.setState({new_state});
-//<input type="text" value={this.state.name}
-//onChange={event => this.update_name(event)}/>
 }  
 
 handleSubmit(event) {
@@ -70,7 +92,8 @@ handleSubmit(event) {
 }
 
 handleAddContact = () => {
-  this.state.contacts.push({
+//  this.state.contacts.push
+  database.ref(User.user.uid).push({
     name: this.state.name, 
     email: this.state.email, 
     phone: this.state.phone, 
@@ -82,7 +105,7 @@ handleAddContact = () => {
   });
   this.state.contacts.sort(compare);
   this.setState({contacts: this.state.contacts});
-  localStorage.contacts =JSON.stringify(this.state.contacts);
+//  localStorage.contacts =JSON.stringify(this.state.contacts);
   this.setState({open: true});
 }
 

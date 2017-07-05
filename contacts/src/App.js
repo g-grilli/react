@@ -11,7 +11,9 @@ import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/menu';
+import FlatButton from 'material-ui/FlatButton';
 import './App.css'
+import {auth} from './fsociety';
 
 //const Home = () => (<h2>Home</h2>);
 
@@ -41,14 +43,26 @@ const AppMenu = (props) => (
 );
 
 class App extends Component {
-  render() {
-    return (
-      <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-      <div>
-      
+  login () {
+    console.log('logging in');
+  auth()
+    .then(function (user) {
+      console.log(user);
+    })
+    .catch(function (e) {
+      console.log(e);
+    });
+ }
+ render() {
+  return (
+   <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+    <div>
       <BrowserRouter>
        <div>
-        <AppBar title='Contact App' iconElementLeft={<AppMenu/>}/>
+        <AppBar title='Contact App' 
+        iconElementLeft={<AppMenu/>}
+        iconElementRight={<FlatButton label="Log In" onClick={(e) => this.login(e)}/>}
+        />
         <Switch>
          <Route exact path="/" component={Home}/>
          <Route path="/contacts" component={Contacts}/>

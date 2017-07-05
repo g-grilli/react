@@ -3,6 +3,7 @@ import {Card, CardHeader, CardTitle, CardActions, CardText} from 'material-ui/Ca
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import database, {User} from './fsociety';
 import './contacts.css';
 
 
@@ -15,11 +16,12 @@ function compare(a,b) {
       } 
       return 0;
 }
+
 class Contacts extends Component {
   constructor(props) {
     super(props);
-    var contacts = localStorage.contacts || '[]';
-    contacts = JSON.parse(contacts);
+//    var contacts = localStorage.contacts || '[]';
+//    contacts = JSON.parse(contacts);
     this.state = {
       name: ' ',
       phone: ' ',
@@ -29,10 +31,32 @@ class Contacts extends Component {
       state: ' ',
       zipCode: ' ',
       isOpened: ' ',
-      contacts: contacts
+      contacts: []
     };
-    this.state.contacts.sort(compare);
+    //this.state.contacts.sort(compare);
     this.state.display_contacts = this.state.contacts;
+    
+    this.read_data();
+  }
+  
+  read_data () {
+    if (User.user) {
+      database.ref('contacts/' + User.user.uid)
+        .once('value').then(function(contacts) {
+          var contacts = contacts.val();
+          console.log(contacts);
+          if (contacts) {
+            this.state.contacts = contacts;
+            this.setState({contacts: this.state.contacts});
+            this.state.contacts.sort(compare);
+            this.state.display_contacts = this.state.contacts;
+          }
+        });
+    } else {
+      setTimeout(() => {
+        this.read_data();
+      }, 300);
+    }
   }
   
   update_state (event, key) {
@@ -112,8 +136,8 @@ do_search (event) {
             Address:<br/>
             <TextField floatingLabelText="Address" value={c.address} onChange={(event) => this.handleField(event, 'address', index)} />
             <br/>
-            <TextField floatingLabelText="City" value={c.city} onChange={(event) => this.handleField(event, 'city', index)}/>, 
-            <TextField floatingLabelText="State" value={c.state} onChange={(event) => this.handleField(event, 'state', index)}/>, 
+            <TextField floatingLabelText="City" value={c.city} onChange={(event) => this.handleField(event, 'city', index)}/> 
+            <TextField floatingLabelText="State" value={c.state} onChange={(event) => this.handleField(event, 'state', index)}/> 
             <TextField floatingLabelText="Zip Code" value={c.zipCode}onChange={(event) => this.handleField(event, 'zipCode', index)}/>
             <br/><br/>
             <TextField floatingLabelText="Phone" value={c.phone}onChange={(event) => this.handleField(event, 'phone', index)}/>
