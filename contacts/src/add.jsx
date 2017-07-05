@@ -56,12 +56,11 @@ class Add extends Component {
     
     this.read_data();
   }
-  
   read_data () {
     if (User.user) {
       database.ref('contacts/' + User.user.uid)
-        .once('value').then(function(contacts) {
-          var contacts = contacts.val();
+        .once('value').then((contacts) => {
+          contacts = contacts.val();
           console.log(contacts);
           if (contacts) {
             this.state.contacts = contacts;
@@ -92,8 +91,7 @@ handleSubmit(event) {
 }
 
 handleAddContact = () => {
-//  this.state.contacts.push
-  database.ref(User.user.uid).push({
+  this.state.contacts.push({
     name: this.state.name, 
     email: this.state.email, 
     phone: this.state.phone, 
@@ -103,9 +101,10 @@ handleAddContact = () => {
     zipCode: this.state.zipCode,
     isOpened: false
   });
+  
   this.state.contacts.sort(compare);
+  database.ref('contacts/' + User.user.uid).set(this.state.contacts);
   this.setState({contacts: this.state.contacts});
-//  localStorage.contacts =JSON.stringify(this.state.contacts);
   this.setState({open: true});
 }
 

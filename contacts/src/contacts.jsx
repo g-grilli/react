@@ -42,14 +42,14 @@ class Contacts extends Component {
   read_data () {
     if (User.user) {
       database.ref('contacts/' + User.user.uid)
-        .once('value').then(function(contacts) {
-          var contacts = contacts.val();
+        .once('value').then((contacts) => {
+          contacts = contacts.val();
           console.log(contacts);
           if (contacts) {
             this.state.contacts = contacts;
-            this.setState({contacts: this.state.contacts});
             this.state.contacts.sort(compare);
             this.state.display_contacts = this.state.contacts;
+            this.setState({contacts: this.state.contacts});
           }
         });
     } else {
@@ -72,10 +72,28 @@ handleSubmit(event) {
   console.log('submitted: ' + this.state.name +' '+ this.state.email);
   event.preventDefault();
 }
+handleAddContact = () => {
+  this.state.contacts.push({
+    name: this.state.name, 
+    email: this.state.email, 
+    phone: this.state.phone, 
+    address: this.state.address, 
+    city: this.state.city, 
+    state: this.state.state, 
+    zipCode: this.state.zipCode,
+    isOpened: false
+  });
+  
+  this.state.contacts.sort(compare);
+  database.ref('contacts/' + User.user.uid).set(this.state.contacts);
+  this.setState({contacts: this.state.contacts});
+  this.setState({open: true});
+}
 
 handleEditContact = (index) => {
   console.log(this.state.contacts);
-  localStorage.contacts =JSON.stringify(this.state.contacts);
+  database.ref('contacts/' + User.user.uid).set(this.state.contacts);
+  this.setState({contacts: this.state.contacts});
   this.setState({open: true});
 }
 
@@ -86,9 +104,9 @@ handleField (event, field, index) {
 
 handleDelete (index) {
   this.state.contacts.splice(index, 1);
+  database.ref('contacts/' + User.user.uid).set(this.state.contacts);
   this.setState({contacts: this.state.contacts});
   this.state.contacts.sort(compare);
-  localStorage.contacts =JSON.stringify(this.state.contacts);
 }
 
 handleExpandChange = (expanded) => {
