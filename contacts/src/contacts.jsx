@@ -1,24 +1,47 @@
 import React, { Component } from 'react';
-import AppBar from 'material-ui/AppBar';
-import {Card, CardHeader, CardActions, CardTitle, CardText} from 'material-ui/Card';
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
+import {Card, CardHeader, CardTitle, CardActions, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
-
+import TextField from 'material-ui/TextField';
+import RaisedButton from 'material-ui/RaisedButton';
 import './contacts.css';
 
-var default_contacts = [{name: 'Sue', email: 'sue@gmail.com', phone: '832-222-5555', address: '123 Baker Street', city: 'Houston', state: 'Texas', zipCode: '77040'}, {name: 'Steve', email: 'Steve@gmail.com', phone: '832-555-2222', address: '123 Cook Street', city: 'Houston', state: 'Texas', zipCode: '77041'}];
+
+function compare(a,b) {
+      if (a.name < b.name) {
+        return -1;
+      }
+      if (a.name > b.name) {
+        return 1;
+      } 
+      return 0;
+}
 class Contacts extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    var contacts = localStorage.contacts || '[]';
+    contacts = JSON.parse(contacts);
     this.state = {
-      contacts: default_contacts
+      name: ' ',
+      phone: ' ',
+      email: ' ',
+      address: ' ',
+      city: ' ',
+      state: ' ',
+      zipCode: ' ',
+      isOpened: ' ',
+      contacts: contacts
     };
+    this.state.contacts.sort(compare);
+    this.state.display_contacts = this.state.contacts;
   }
   
-update_state (event, key) {
-console.log(event.target.value);  
-this.setState({[key]: event.target.value});
+  update_state (event, key) {
+  console.log(event.target.value);
+  console.log(event.target);
+  this.setState({[key]: event.target.value});
+  var new_state = {};
+  new_state[key] = event.target.value;
+  this.setState({new_state});
 }  
 
 handleSubmit(event) {
@@ -26,100 +49,92 @@ handleSubmit(event) {
   event.preventDefault();
 }
 
-handleAddContact = () => {
-  this.state.contacts.push({name: this.state.name, email: this.state.email, phone: this.state.phone, address: this.state.address, city: this.state.city, state: this.state.state, zipCode: this.state.zipCode});
-  this.setState({contacts: this.state.contacts});
-  this.setState({name: ' ', email: ' ', phone: ' ', address: ' ', city: ' ', state: ' ', zipCode: ' '})
+handleEditContact = (index) => {
+  console.log(this.state.contacts);
+  localStorage.contacts =JSON.stringify(this.state.contacts);
+  this.setState({open: true});
 }
-handleEditContact = () => {
-  this.state.contacts.push({name: this.state.name, email: this.state.email, address: this.state.address, city: this.state.city, state: this.state.state, zipCode: this.state.zipCode});
+
+handleField (event, field, index) {
+  this.state.contacts[index][field] = event.target.value;
   this.setState({contacts: this.state.contacts});
-  this.setState({name: ' ', email: ' ', phone: ' ', address: ' ', city: ' ', state: ' ', zipCode: ' '})
 }
-handleDeleteContact = () => {
-  this.state.contacts.push({name: this.state.name, email: this.state.email, address: this.state.address, city: this.state.city, state: this.state.state, zipCode: this.state.zipCode});
+
+handleDelete (index) {
+  this.state.contacts.splice(index, 1);
   this.setState({contacts: this.state.contacts});
-  this.setState({name: ' ', email: ' ', address: ' ', phone: ' ', city: ' ', state: ' ', zipCode: ' '})
+  this.state.contacts.sort(compare);
+  localStorage.contacts =JSON.stringify(this.state.contacts);
 }
+
 handleExpandChange = (expanded) => {
   this.setState({expanded: expanded});
 };
 
+do_search (event) {
+  var term = event.target.value;
+  
+  var filter_contacts = [];
+  
+  this.state.contacts.forEach(function (c) {
+    if (c.name.toLowerCase().search(term.toLowerCase()) > -1) {
+      filter_contacts.push(c);
+    }
+      
+  });
+  
+  this.setState({display_contacts: filter_contacts});
+}
+
     render() {
     return (
       <div>
-       <AppBar title="Contacts" />
-       <form onSubmit={event => this.handleSubmit(event)}>
        <Card className="md-card">
-        <CardTitle title="Contact Editing" subtitle="Friends"/>
-          <CardText>
-           <TextField floatingLabelText="Name"
-           value={this.state.name}
-           onChange={event => this.update_state(event, 'name')}/>
-           <br/><br/>
-           <TextField floatingLabelText="E-mail"
-           value={this.state.email}
-           onChange={event => this.update_state(event, 'email')}/>
-           <br/><br/>
-            <TextField floatingLabelText="Phone"
-           value={this.state.phone}
-           onChange={event => this.update_state(event, 'phone')}/>
-           <br/><br/>
-           <TextField floatingLabelText="Street Address"
-           value={this.state.address}
-           onChange={event => this.update_state(event, 'address')}/>
-           <br/><br/>
-           <TextField floatingLabelText="City"
-           value={this.state.city}
-           onChange={event => this.update_state(event, 'city')}/>
-           <br/><br/>
-           <TextField floatingLabelText="State"
-           value={this.state.state}
-           onChange={event => this.update_state(event, 'state')}/>
-           <br/><br/>
-           <TextField floatingLabelText="Zip Code"
-           value={this.state.zipCode}
-           onChange={event => this.update_state(event, 'zipCode')}/>
-          </CardText>
-          <CardActions>
-           <RaisedButton type="submit" label='ADD' primary={true} onClick={this.handleAddContact}/>
-           <RaisedButton type="submit" label='EDIT' primary={true} onClick={this.handleAddContact}/>
-           <RaisedButton type="submit" label='DELETE' primary={true} onClick={this.handleAddContact}/>
-          </CardActions> 
+        <CardTitle title="Search Contacts"/>
+         <CardText expandable={false}>
+          <TextField floatingLabelText="Search"
+           onChange={event => this.do_search(event)}/>
+         </CardText>
        </Card>
-       </form>
-       <div>
-          <AppBar title="Contact List" />
-          {this.state.contacts.map((c) => {
-            return (
-              <Card className="md-card">
-                <CardHeader
-                 title={c.name}
-                 subtitle={c.city}
-                 actAsExpander={true}
-                 showExpandableButton={true}
-                />
-                <CardText expandable={true}>
-                  {c.name}<br/><br/>
-                  Address:<br/><br/>
-                  {c.address}<br/>
-                  {c.city}, {c.state}, {c.zipCode}
-                  <br/><br/>
-                  phone:{c.phone}
-                  <br/><br/>
-                  E-mail: {c.email}
-                </CardText>
-                <CardActions>
-                 <FlatButton label="Favorite" onTouchTap={this.handleFavorite} />
-                 <FlatButton label="Hide" onTouchTap={this.handleHide} />
-                </CardActions>
-              </Card>
+       <Card className="md-card">
+        <CardTitle title="Contact List" subtitle="Click Name For Details"/>
+       </Card>
+       {this.state.display_contacts.map((c, index) => {
+        return (
+         <Card className="md-card">
+          <CardHeader
+            title={c.name}
+            subtitle={c.city}
+            actAsExpander={true}
+            showExpandableButton={true}/>
+          <CardText expandable={true}>
+            <TextField floatingLabelText="Name" value={c.name} onChange={(event) => this.handleField(event, 'name', index)}/><br/>
+            Address:<br/>
+            <TextField floatingLabelText="Address" value={c.address} onChange={(event) => this.handleField(event, 'address', index)} />
+            <br/>
+            <TextField floatingLabelText="City" value={c.city} onChange={(event) => this.handleField(event, 'city', index)}/>, 
+            <TextField floatingLabelText="State" value={c.state} onChange={(event) => this.handleField(event, 'state', index)}/>, 
+            <TextField floatingLabelText="Zip Code" value={c.zipCode}onChange={(event) => this.handleField(event, 'zipCode', index)}/>
+            <br/><br/>
+            <TextField floatingLabelText="Phone" value={c.phone}onChange={(event) => this.handleField(event, 'phone', index)}/>
+            <br/><br/>
+            <TextField floatingLabelText="E-mail" value={c.email}onChange={(event) => this.handleField(event, 'email', index)}/>
+            <CardActions>
+             <FlatButton label="Favorite" primary={true} onTouchTap={this.handleMakeFavorite} />
+             <FlatButton type="submit" label='DELETE' primary={true} onClick={() => this.handleDelete(index)}/>
+             <FlatButton type="submit" label='EDIT' primary={true} onClick={() => this.handleEditContact(index)} />
+             </CardActions>
+            </CardText>
+          </Card>
             )
           })}
+        <Card className="md-card"> 
+        <CardActions> 
+          <RaisedButton type="submit" label="Add Contacts" primary={true} href='./add' />
+          </CardActions>
+        </Card>
        </div>
-      </div>
     );
   } 
 }
-
 export default Contacts
