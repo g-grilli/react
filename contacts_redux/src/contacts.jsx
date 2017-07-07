@@ -1,27 +1,18 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
+
 import {Card, CardHeader, CardTitle, CardActions, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
-import database, {User} from './fsociety';
+//import database, {User} from './fsociety';
 import './contacts.css';
 
-
-function compare(a,b) {
-      if (a.name < b.name) {
-        return -1;
-      }
-      if (a.name > b.name) {
-        return 1;
-      } 
-      return 0;
-}
+import {editContact, deleteContact} from './actions.js';
+import {connect} from 'react-redux';
 
 class Contacts extends Component {
   constructor(props) {
     super(props);
-//    var contacts = localStorage.contacts || '[]';
-//    contacts = JSON.parse(contacts);
     this.state = {
       name: ' ',
       phone: ' ',
@@ -33,30 +24,9 @@ class Contacts extends Component {
       isOpened: ' ',
       contacts: []
     };
-    //this.state.contacts.sort(compare);
-    this.state.display_contacts = this.state.contacts;
     
-    this.read_data();
-  }
-  
-  read_data () {
-    if (User.user) {
-      database.ref('contacts/' + User.user.uid)
-        .once('value').then((contacts) => {
-          contacts = contacts.val();
-          console.log(contacts);
-          if (contacts) {
-            this.state.contacts = contacts;
-            this.state.contacts.sort(compare);
-            this.state.display_contacts = this.state.contacts;
-            this.setState({contacts: this.state.contacts});
-          }
-        });
-    } else {
-      setTimeout(() => {
-        this.read_data();
-      }, 300);
-    }
+    console.log(this.props);
+    //this.read_data();
   }
   
   update_state (event, key) {
@@ -72,41 +42,24 @@ handleSubmit(event) {
   console.log('submitted: ' + this.state.name +' '+ this.state.email);
   event.preventDefault();
 }
-handleAddContact = () => {
-  this.state.contacts.push({
-    name: this.state.name, 
-    email: this.state.email, 
-    phone: this.state.phone, 
-    address: this.state.address, 
-    city: this.state.city, 
-    state: this.state.state, 
-    zipCode: this.state.zipCode,
-    isOpened: false
-  });
-  
-  this.state.contacts.sort(compare);
-  database.ref('contacts/' + User.user.uid).set(this.state.contacts);
-  this.setState({contacts: this.state.contacts});
+
+handleEditContact = (index) => {
+  console.log(this.props);
+  this.props.onSubmit(index);
   this.setState({open: true});
 }
 
-handleEditContact = (index) => {
-  console.log(this.state.contacts);
-  database.ref('contacts/' + User.user.uid).set(this.state.contacts);
-  this.setState({contacts: this.state.contacts});
-  this.setState({open: true});
+handleDeleteContact = (index) => {
+  console.log(this.props);
+  this.props.doDelete(index);
 }
 
 handleField (event, field, index) {
-  this.state.contacts[index][field] = event.target.value;
-  this.setState({contacts: this.state.contacts});
-}
-
-handleDelete (index) {
-  this.state.contacts.splice(index, 1);
-  database.ref('contacts/' + User.user.uid).set(this.state.contacts);
-  this.setState({contacts: this.state.contacts});
-  this.state.contacts.sort(compare);
+  console.log(this.props);
+  this.props.contacts[index][field] = event.target.value;
+  this.props({contacts: this.state.contacts});
+//  this.state.contacts[index][field] = event.target.value;
+//  this.setState({contacts: this.state.contacts});
 }
 
 handleExpandChange = (expanded) => {
@@ -115,16 +68,13 @@ handleExpandChange = (expanded) => {
 
 do_search (event) {
   var term = event.target.value;
-  
   var filter_contacts = [];
   
   this.state.contacts.forEach(function (c) {
     if (c.name.toLowerCase().search(term.toLowerCase()) > -1) {
       filter_contacts.push(c);
     }
-      
   });
-  
   this.setState({display_contacts: filter_contacts});
 }
 
@@ -141,7 +91,7 @@ do_search (event) {
        <Card className="md-card">
         <CardTitle title="Contact List" subtitle="Click Name For Details"/>
        </Card>
-       {this.state.display_contacts.map((c, index) => {
+       {this.props.contacts.map((c, index) => {
         return (
          <Card className="md-card">
           <CardHeader
@@ -163,7 +113,7 @@ do_search (event) {
             <TextField floatingLabelText="E-mail" value={c.email}onChange={(event) => this.handleField(event, 'email', index)}/>
             <CardActions>
              <FlatButton label="Favorite" primary={true} onTouchTap={this.handleMakeFavorite} />
-             <FlatButton type="submit" label='DELETE' primary={true} onClick={() => this.handleDelete(index)}/>
+             <FlatButton type="submit" label='DELETE' primary={true} onClick={() => this.handleDeleteContact(index)}/>
              <FlatButton type="submit" label='EDIT' primary={true} onClick={() => this.handleEditContact(index)} />
              </CardActions>
             </CardText>
@@ -179,4 +129,24 @@ do_search (event) {
     );
   } 
 }
+
+function mapStateToProps (state) {
+  return {contacts: state}
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    onSubmit: function (index, data) {
+      dispatch(editContact(index, data))
+    },
+    doDelete: function (index) {
+      dispatch(deleteContact(index))
+    } 
+  }
+}
+
+Contacts =  connect(
+  mapStateToProps, mapDispatchToProps)(Contacts);
+
+
 export default Contacts

@@ -1,4 +1,3 @@
-// NOT USED - functionality was added to contactss card.
 import React, { Component } from 'react';
 import {Card, CardActions, CardTitle, CardText} from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -7,21 +6,21 @@ import TextField from 'material-ui/TextField';
 import Dialog from 'material-ui/Dialog';
 import './contacts.css';
 
-function compare(a,b) {
-      if (a.name < b.name) {
-        return -1;
-      }
-      if (a.name > b.name) {
-        return 1;
-      } 
-      return 0;
-    }
+import database, {User} from './fsociety';
+
+import {addContact} from './actions.js';
+import { connect } from 'react-redux';
+
+
+
+
+
 const customContentStyle = {
   width: '100%',
   maxWidth: 'none',
 };
 
-class Edit extends Component {
+class Add extends Component {
   state = {
     open: false
     };
@@ -36,9 +35,6 @@ class Edit extends Component {
   constructor(props) {
     super(props);
     
-    var contacts = localStorage.contacts || '[]';
-    contacts = JSON.parse(contacts);
-    
     this.state = {
       name: ' ',
       phone: ' ',
@@ -48,10 +44,31 @@ class Edit extends Component {
       state: ' ',
       zipCode: ' ',
       isOpened: ' ',
-      contacts: contacts
+      contacts: []
     };
     
-    this.state.contacts.sort(compare);
+    this.state.display_contacts = this.state.contacts;
+    
+    this.read_data();
+  }
+  read_data () {
+    if (User.user) {
+      database.ref('contacts/' + User.user.uid)
+        .once('value').then((contacts) => {
+          contacts = contacts.val();
+          console.log(contacts);
+          if (contacts) {
+            this.state.contacts = contacts;
+            this.setState({contacts: this.state.contacts});
+            //this.state.contacts.sort(compare);
+            this.state.display_contacts = this.state.contacts;
+          }
+        });
+    } else {
+      setTimeout(() => {
+        this.read_data();
+      }, 300);
+    }
   }
   
 update_state (event, key) {
@@ -61,8 +78,6 @@ this.setState({[key]: event.target.value});
 var new_state = {};
 new_state[key] = event.target.value;
 this.setState({new_state});
-//<input type="text" value={this.state.name}
-//onChange={event => this.update_name(event)}/>
 }  
 
 handleSubmit(event) {
@@ -70,8 +85,8 @@ handleSubmit(event) {
   event.preventDefault();
 }
 
-handleEditContact = () => {
-  this.state.contacts.push({
+handleAddContact = () => {
+  this.props.onSubmit({
     name: this.state.name, 
     email: this.state.email, 
     phone: this.state.phone, 
@@ -81,9 +96,7 @@ handleEditContact = () => {
     zipCode: this.state.zipCode,
     isOpened: false
   });
-  this.state.contacts.sort(compare);
-  this.setState({contacts: this.state.contacts});
-  localStorage.contacts =JSON.stringify(this.state.contacts);
+  
   this.setState({open: true});
 }
 
@@ -104,15 +117,9 @@ handleExpandChange = (expanded) => {
     ];
     return (
       <div>
-       <Card className="md-card">
-        <CardTitle title="Edit Contacts"/>
-         <CardText expandable={false}>
-          <TextField floatingLabelText="Search"
-           onChange={event => this.do_search(event)}/>
-         </CardText>
-       </Card>
        <form onSubmit={event => this.handleSubmit(event)}>
        <Card className="md-card">
+        <CardTitle title="Add New Contact"/>
           <CardText>
            <TextField floatingLabelText="Name"
            value={this.state.name}
@@ -143,23 +150,39 @@ handleExpandChange = (expanded) => {
            onChange={event => this.update_state(event, 'zipCode')}/>
           </CardText>
           <CardActions>
-            <RaisedButton type="submit" label="Edit Contact" primary={true} onTouchTap={this.handleEditContact}/>
-             <Dialog
-              title="Edit Contact"
-              actions={actions}
-              modal={true}
-              contentStyle={customContentStyle}
-              open={this.state.open}
-              >
-              A new contact has been added.
-             </Dialog>
-           <RaisedButton type="submit" label="View Contacts" primary={true} href='./contacts' />
+          <RaisedButton type="submit" label="Add Contact" primary={true} onTouchTap={this.handleAddContact}/>
+           <Dialog
+            title="Add Contact"
+            actions={actions}
+            modal={true}
+            contentStyle={customContentStyle}
+            open={this.state.open}
+            >
+            A new contact has been added.
+           </Dialog>
+           <RaisedButton label="View Contacts" primary={true} href='/contacts' />
           </CardActions> 
         </Card>
        </form>
       </div>
+      
     );
   } 
 }
 
-export default Edit
+//export default Add
+function mapStateToProps (state) {
+  return {contacts: state}
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    onSubmit: function (data) {
+      dispatch(addContact(data))
+    }
+  }
+}
+
+Add = connect(mapStateToProps, mapDispatchToProps)(Add)
+
+export default Add
