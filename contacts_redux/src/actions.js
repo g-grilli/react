@@ -13,10 +13,11 @@ export function editContact (index, data) {
   }
 }
 
-export function deleteContact (index) {
+export function deleteContact (findex, oindex) {
   return {
     type: 'DELETE_CONTACT',
-    index: index
+    findex: findex,
+    oindex: oindex
   }
 }
 
@@ -26,3 +27,25 @@ export function initContacts (data) {
     data: data
   }
 }
+
+export function doSort () {
+  return {
+    type: 'DO_SORT'
+  }
+}
+
+export function doExpand (index, expanded) {
+  return {
+    type: 'DO_EXPAND',
+    expanded: expanded,
+    index: index
+  }
+}
+
+export function doSearch (term) {
+  return {
+    type: 'DO_SEARCH',
+    term: term
+  }
+}
+

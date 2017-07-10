@@ -36,14 +36,14 @@ class Add extends Component {
     super(props);
     
     this.state = {
-      name: ' ',
-      phone: ' ',
-      email: ' ',
-      address: ' ',
-      city: ' ',
-      state: ' ',
-      zipCode: ' ',
-      isOpened: ' ',
+      name: '',
+      phone: '',
+      email: '',
+      address: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      isOpened: '',
       contacts: []
     };
     

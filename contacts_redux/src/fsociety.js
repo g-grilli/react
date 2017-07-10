@@ -55,7 +55,9 @@ function read_data () {
 }
 
 let unsubscribe = store.subscribe(() => {
-  database.ref('contacts/' + User.user.uid).set(store.getState());
+  database.ref('contacts/' + User.user.uid).set(
+    store.getState().contacts
+  );
 });
 
 
