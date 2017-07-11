@@ -72,7 +72,6 @@ class ContactCard extends Component {
           <CardActions>
            <FlatButton label="Favorite" primary={true} onTouchTap={this.handleMakeFavorite} />
            <FlatButton type="submit" label='DELETE' primary={true} onClick={() => this.handleDeleteContact(this.props.index, this.props.contact.orig)}/>
-           <FlatButton type="submit" label='Save' primary={true} onClick={() => this.handleEditContact(this.props.index, this.props.contact.orig)}/>
            </CardActions>
           </CardText>
       </Card>
