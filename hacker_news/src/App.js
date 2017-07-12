@@ -10,11 +10,12 @@ import MenuItem from 'material-ui/MenuItem';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/menu';
 import FlatButton from 'material-ui/FlatButton';
 
-import {auth} from './fsociety';
-import News from './news';
-import Id from './id';
+import news from './news';
+import database from './fire';
+import TopStories from './topstories'
 
-//import store from './store.js';
+import { Provider } from 'react-redux';
+import store from './store.js';
 
 //const Home = () => (<h2>Home</h2>);
 
@@ -42,20 +43,20 @@ const AppMenu = (props) => (
   </IconMenu>
 );
 
-class App extends Component {
-  login () {
-    console.log('logging in');
-  auth()
-    .then(function (user) {
-      console.log(user);
-    })
-    .catch(function (e) {
-      console.log(e);
-    });
- }
+ class App extends Component {
+//   login () {
+//     console.log('logging in');
+//   auth()
+//     .then(function (user) {
+//       console.log(user);
+//     })
+//     .catch(function (e) {
+//       console.log(e);
+//     });
+// }
  render() {
   return (
-//    <Provider store={store}>
+    <Provider store={store}>
      <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
       <div>
         <BrowserRouter>
@@ -65,15 +66,15 @@ class App extends Component {
           iconElementRight={<FlatButton label="Log In" onClick={(e) => this.login(e)}/>}
           />
           <Switch>
-           <Route exact path="/" component={News}/>
-           <Route exact path="/id" component={Id}/>
+           <Route exact path="/" component={TopStories}/>
+           <Route path="/news" component={news}/>
            <Route component={NoMatch}/>
           </Switch>
          </div>
         </BrowserRouter>
         </div>
         </MuiThemeProvider>
-//    </Provider>
+    </Provider>
   );
  }
 }

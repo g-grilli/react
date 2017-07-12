@@ -1,4 +1,4 @@
-import debounce from 'debounce';
+ import debounce from 'debounce';
 
 import {doSort, doSearch} from './actions';
 import store from './store';

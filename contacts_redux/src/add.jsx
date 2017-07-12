@@ -11,10 +11,6 @@ import database, {User} from './fsociety';
 import {addContact} from './actions.js';
 import { connect } from 'react-redux';
 
-
-
-
-
 const customContentStyle = {
   width: '100%',
   maxWidth: 'none',

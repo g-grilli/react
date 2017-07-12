@@ -1,17 +1,13 @@
 import React, {Component} from 'react';
 
-import {Card, CardHeader, CardTitle, CardActions, CardText} from 'material-ui/Card';
+import {Card, CardHeader, CardActions, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
 
 import {editContact, deleteContact, doSort, doSearch, doExpand} from './actions.js';
 import {connect} from 'react-redux';
 
 class ContactCard extends Component {
-  constructor (props) {
-    super(props);
-  }
   
   handleExpandChange = (index, expanded) => {
     this.props.doExpand(index, expanded);

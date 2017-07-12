@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import Contacts from './contacts';
-import Home from './home';
-import Add from './add';
+import logo from './logo.svg';
 import AppBar from 'material-ui/AppBar';
 import {BrowserRouter, Route, Link, Switch} from 'react-router-dom';
 import IconButton from 'material-ui/IconButton';
@@ -12,13 +10,16 @@ import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/menu';
 import FlatButton from 'material-ui/FlatButton';
-import './App.css'
+
 import {auth} from './fsociety';
+import Home from './home';
+import Main from './main';
+import './App.css'
 
 import { Provider } from 'react-redux';
 import store from './store.js';
 
-//const Home = () => (<h2>Home</h2>);
+//const Home = () => (<h2>Home</h2>)
 
 const NoMatch = ({ location }) => (
   <div>
@@ -61,17 +62,16 @@ class App extends Component {
   return (
     <Provider store={store}>
      <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-      <div>
+      <div className="Main">
+        <div className="Main-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <h2>Welcome to Kidney Track</h2>
+        </div>
         <BrowserRouter>
          <div>
-          // <AppBar title='Contact App' 
-          // iconElementLeft={<AppMenu/>}
-          // iconElementRight={<FlatButton label="Log In" onClick={(e) => this.login(e)}/>}
-          // />
           <Switch>
            <Route exact path="/" component={Home}/>
-           <Route path="/contacts" component={Contacts}/>
-           <Route path="/add" component={Add}/>
+           <Route path="/main" component={Main}/>
            <Route component={NoMatch}/>
           </Switch>
          </div>

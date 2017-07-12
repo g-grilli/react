@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Card, CardHeader, CardTitle, CardActions, CardText} from 'material-ui/Card';
-import FlatButton from 'material-ui/FlatButton';
+import {Card, CardTitle, CardActions, CardText} from 'material-ui/Card';
+
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import './contacts.css';

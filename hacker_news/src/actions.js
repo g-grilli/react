@@ -1,6 +1,6 @@
-export function addHackerNews (data) {
+export function set_stories (stories) {
   return {
-    type: 'Get_DATA',
-    data: data
-  }
+    type: 'SET_TOP_STORIES',
+    stories: stories
+  };
 }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import { connect } from 'react-redux';
 
 class News extends Component {
     constructor(props) {
@@ -68,4 +69,11 @@ class News extends Component {
   } 
 }
 
+function mapStateToProps (state) {
+  return {
+    stories: state.top_stories
+  }
+}
+
+News = connect(mapStateToProps)(News)
 export default News
