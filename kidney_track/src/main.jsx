@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {Card, CardHeader, CardTitle, CardActions, CardText} from 'material-ui/Card';
-import logo from './logo.svg';
-import './App.css'
+
 
 class Main extends Component {
   render() {
